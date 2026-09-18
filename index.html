@@ -69,7 +69,7 @@ async function loadTable(table, gridId, type) {
     }).join('');
   } catch (error) {
     console.error(`Could not load ${table}:`, error);
-    grid.innerHTML = '<div class="muted">Could not load this section. Check your Supabase settings.</div>';
+    grid.innerHTML = '<div class="muted">Could not load ' + table + ': ' + error.message + '</div>';
   }
 }
 
