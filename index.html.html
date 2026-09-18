@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ZedVibes — Music, Movies & Videos</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#070d14;color:#f5f7fa;font:15px Arial,sans-serif}header{position:sticky;top:0;z-index:9;height:70px;background:#0b121b;border-bottom:1px solid #1a2732;display:flex;align-items:center;padding:0 5%;gap:25px}.logo{font-size:27px;font-weight:800}.logo span{color:#00d95f}nav{display:flex;gap:20px;flex:1}nav a{color:#dce3e9;text-decoration:none}nav a:hover{color:#00d95f}.search{background:#17222d;border:0;border-radius:22px;padding:11px 17px;color:#fff;width:250px}.hero{padding:70px 6%;min-height:350px;background:linear-gradient(90deg,#071018 20%,rgba(7,16,24,.55)),linear-gradient(135deg,#123625,#572d0c)}.hero h1{font-size:52px;margin:8px 0}.hero h1 span{color:#00d95f}.hero p{max-width:620px;color:#c8d1d9;line-height:1.6;font-size:17px}.btn{border:0;border-radius:23px;padding:12px 20px;background:#00d95f;font-weight:bold;cursor:pointer}.wrap{padding:32px 5%}.head{display:flex;justify-content:space-between;align-items:center;margin-bottom:17px}.head h2{margin:0}.muted{color:#91a0ae}.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:17px}.card{background:#101923;border:1px solid #192631;border-radius:13px;overflow:hidden}.visual{height:160px;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;background:linear-gradient(135deg,#183d2b,#8a4b12)}.body{padding:13px}.body h3{margin:0 0 6px;font-size:16px}.body p{margin:0;color:#91a0ae;font-size:13px}.play{float:right;border:1px solid #00d95f;color:#00d95f;background:transparent;border-radius:50%;width:34px;height:34px;cursor:pointer}.tabs{display:flex;gap:10px;margin-bottom:18px}.tab{padding:9px 16px;border-radius:20px;background:#15212c;color:#cbd5dd;cursor:pointer}.tab.active{background:#00d95f;color:#001308;font-weight:bold}.promo{background:#101923;border:1px solid #1c2b36;border-radius:14px;padding:25px;display:flex;justify-content:space-between;align-items:center}.movie .visual{background:linear-gradient(135deg,#2b234e,#8b321c)}.video .visual{background:linear-gradient(135deg,#122f45,#5c1935)}footer{padding:45px 5% 100px;border-top:1px solid #182631;color:#91a0ae}.player{position:fixed;bottom:0;left:0;right:0;background:#0d151e;border-top:1px solid #253440;padding:11px 5%;display:flex;gap:18px;align-items:center;z-index:10}.bar{height:5px;background:#293742;flex:1;border-radius:5px}.progress{height:100%;width:35%;background:#00d95f;border-radius:5px}
+@media(max-width:900px){nav{display:none}.grid{grid-template-columns:repeat(2,1fr)}.search{width:170px}}@media(max-width:520px){.grid{grid-template-columns:1fr}.hero h1{font-size:40px}.promo{display:block}}
+</style></head><body>
+<header><div class="logo">Zed<span>Vibes</span></div><nav><a href="#music">Music</a><a href="#videos">Videos</a><a href="#movies">Movies</a><a href="#news">News</a><a href="#submit">Submit</a></nav><input class="search" id="search" placeholder="Search ZedVibes..."></header>
+<section class="hero"><div class="muted">🇿🇲 ZAMBIAN + 🌍 INTERNATIONAL</div><h1>Music. Movies. <span>Vibes.</span></h1><p>Discover music, music videos, movie information and entertainment from Zambia and around the world — all in one place.</p><button class="btn" onclick="document.querySelector('#music').scrollIntoView({behavior:'smooth'})">Explore ZedVibes →</button></section>
+
+<section class="wrap" id="music"><div class="head"><h2>🎵 Free Music Downloads</h2><span class="muted">Authorized releases</span></div><div class="grid searchable" id="music-grid"><div class="muted">Loading music...</div></div></section>
+
+<section class="wrap" id="videos"><div class="head"><h2>🎬 Music & Entertainment Videos</h2></div><div class="grid searchable" id="videos-grid"><div class="muted">Loading videos...</div></div></section>
+
+<section class="wrap" id="movies"><div class="head"><h2>🍿 Movie Catalog</h2><span class="muted">Discover & watch legally</span></div><div class="tabs"><div class="tab active">All</div><div class="tab">Action</div><div class="tab">Comedy</div><div class="tab">Drama</div><div class="tab">African</div></div><div class="grid searchable" id="movies-grid"><div class="muted">Loading movies...</div></div></section>
+
+<section class="wrap" id="submit"><div class="promo"><div><h2>🎤 Are you an artist or filmmaker?</h2><p class="muted">Submit music or video content for consideration. Creators can choose authorized free distribution, streaming embeds, or promotional placement.</p></div><button class="btn" onclick="alert('Submission form will be connected in the next version.')">Submit Content</button></div></section>
+<section class="wrap" id="news"><div class="head"><h2>📰 Entertainment News</h2></div><div class="promo"><div><h3>ZedVibes News</h3><p class="muted">A future section for Zambian and international music, movie and entertainment stories.</p></div></div></section>
+<footer><div class="logo">Zed<span>Vibes</span></div><p>Music • Movies • Videos • News • Culture</p><p>© 2026 ZedVibes</p></footer>
+<div class="player"><strong id="now">Nothing playing</strong><div class="bar"><div class="progress"></div></div><button class="play" onclick="toggle()" id="toggle">▶</button></div>
+<script>
+const SUPABASE_URL = 'https://beicgnpowmdnrrljofgc.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_sQ4_icM1GeJxHVoC1M3V-g_Pl6TocEc';
+
+async function loadTable(table, gridId, type) {
+  const grid = document.getElementById(gridId);
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/${table}?select=*&order=created_at.desc`,
+      {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
+      }
+    );
+
+    if (!response.ok) throw new Error(await response.text());
+    const items = await response.json();
+
+    if (!items.length) {
+      grid.innerHTML = '<div class="muted">No content has been added yet.</div>';
+      return;
+    }
+
+    grid.innerHTML = items.map(item => {
+      const title = item.title || 'Untitled';
+      const artist = item.artist || '';
+      const description = item.description || item.category || '';
+      const image = item.thumbnail_url;
+      const mediaUrl = item.music_url || item.video_url || item.movie_url || '';
+
+      const visual = image
+        ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" style="width:100%;height:100%;object-fit:cover">`
+        : (type === 'music' ? '🎵' : type === 'video' ? '▶' : '🎞️');
+
+      const action = mediaUrl
+        ? `<button class="play" onclick="playUrl('${escapeJs(title + (artist ? ' — ' + artist : ''))}','${escapeJs(mediaUrl)}')">▶</button>`
+        : '';
+
+      return `<div class="card ${type}" data-name="${escapeHtml(title + ' ' + artist + ' ' + description)}">
+        <div class="visual">${visual}</div>
+        <div class="body">
+          ${action}
+          <h3>${escapeHtml(title)}</h3>
+          <p>${escapeHtml(artist || description)}</p>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (error) {
+    console.error(`Could not load ${table}:`, error);
+    grid.innerHTML = '<div class="muted">Could not load this section. Check your Supabase settings.</div>';
+  }
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function escapeJs(value) {
+  return String(value).replace(/\/g,'\\').replace(/'/g,"\'");
+}
+
+let audio = null;
+let on = false;
+
+function play(x) {
+  document.getElementById('now').textContent = x;
+  on = true;
+  document.getElementById('toggle').textContent = 'Ⅱ';
+}
+
+function playUrl(x, url) {
+  play(x);
+  if (audio) audio.pause();
+  audio = new Audio(url);
+  audio.play().catch(err => console.log('Playback requires a valid media URL:', err));
+  audio.onended = () => {
+    on = false;
+    document.getElementById('toggle').textContent = '▶';
+  };
+}
+
+function toggle() {
+  if (audio) {
+    if (audio.paused) {
+      audio.play();
+      on = true;
+    } else {
+      audio.pause();
+      on = false;
+    }
+  } else {
+    on = !on;
+  }
+  document.getElementById('toggle').textContent = on ? 'Ⅱ' : '▶';
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  let q = e.target.value.toLowerCase();
+  document.querySelectorAll('.searchable .card').forEach(c => {
+    c.style.display = c.dataset.name.toLowerCase().includes(q) ? 'block' : 'none';
+  });
+});
+
+loadTable('music', 'music-grid', 'music');
+loadTable('videos', 'videos-grid', 'video');
+loadTable('movies', 'movies-grid', 'movie');
+</script></body></html>
